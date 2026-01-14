@@ -1,0 +1,24 @@
+# Core Python utilities
+requests
+python-dotenv
+numpy
+pydantic
+typing_extensions
+
+# AI / NLP (Xiaomi MiMo v2 – local, free)
+torch
+transformers
+sentencepiece
+accelerate
+
+# Speech-to-Text (Free & Offline)
+vosk
+sounddevice
+
+# Async / backend support
+aiohttp
+anyio
+tqdm
+
+# Optional (logging / config)
+toml
