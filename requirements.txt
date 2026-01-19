@@ -22,3 +22,6 @@ tqdm
 
 # Optional (logging / config)
 toml
+
+
+Hello from Voice Assistant!
