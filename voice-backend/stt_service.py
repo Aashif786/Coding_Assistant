@@ -1,53 +1,35 @@
 import sounddevice as sd
-import numpy as np
-import soundfile as sf
-import tempfile
-from faster_whisper import WhisperModel
+import queue
+import json
+from vosk import Model, KaldiRecognizer
 
+MODEL_PATH = "models/vosk-model-small-en-us-0.15"
 SAMPLE_RATE = 16000
-RECORD_SECONDS = 4  # good for voice commands
 
-# Load model ONCE (important for performance)
-model = WhisperModel(
-    "base",
-    device="cpu",
-    compute_type="int8"  # faster & lower memory
-)
+audio_queue = queue.Queue()
 
-def record_audio():
-    print("🎤 Listening for command...")
-
-    audio = sd.rec(
-        int(RECORD_SECONDS * SAMPLE_RATE),
-        samplerate=SAMPLE_RATE,
-        channels=1,
-        dtype="float32"
-    )
-    sd.wait()
-
-    return audio.squeeze()
+def callback(indata, frames, time, status):
+    if status:
+        print(status)
+    audio_queue.put(bytes(indata))
 
 def listen_once():
-    audio_data = record_audio() 
+    model = Model(MODEL_PATH)
+    recognizer = KaldiRecognizer(model, SAMPLE_RATE)
 
-    # Save to temp WAV (Whisper expects audio input)
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
-        sf.write(tmp.name, audio_data, SAMPLE_RATE)
+    print("🎤 Listening for command...")
 
-        segments, _ = model.transcribe(
-            tmp.name,
-            language="en",
-            beam_size=5
-        )
-
-        text = ""
-        for segment in segments:
-            text += segment.text
-
-        text = text.strip()
-
-        if text:
-            print("📝 Recognized:", text)
-            return text
-
-        return ""
+    with sd.InputStream(
+        samplerate=SAMPLE_RATE,
+        channels=1,
+        dtype="int16",
+        callback=callback
+    ):
+        while True:
+            data = audio_queue.get()
+            if recognizer.AcceptWaveform(data):
+                result = json.loads(recognizer.Result())
+                text = result.get("text", "")
+                if text:
+                    print("📝 Recognized:", text)
+                    return text

@@ -1,5 +1,12 @@
 
 
-def my_function():
+def app():
     pass
+
+
+
+def mean():
+    pass
+
+
 

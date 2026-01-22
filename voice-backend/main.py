@@ -22,23 +22,25 @@ class EditorContext(BaseModel):
     hasSelection: Optional[bool]
 
 @app.post("/command", response_model=CommandAPIResponse)
-def command(context: EditorContext = Body(...)):
+def command(context: dict):
+
     spoken_text = listen_once()
-    intent_result = classify_intent(spoken_text)
+    intent = classify_intent(spoken_text)
 
-    if context.language != "python":
-        return CommandAPIResponse(
-            status="ok",
-            action="message",
-            text="Voice coding currently supports Python files only",
-            intent=intent_result.model_dump()
-        )
-
-    generated_code = generate_code(intent_result)
-
-    return CommandAPIResponse(
-        status="ok",
-        action="intent",
-        text=generated_code if generated_code else spoken_text,
-        intent=intent_result.model_dump()
+    code = generate_code(
+        intent,
+        context.get("language")
     )
+
+    if code:
+        return {
+            "status": "ok",
+            "action": "insert",
+            "text": code
+        }
+
+    return {
+        "status": "ok",
+        "action": "message",
+        "text": f"Unsupported command: {spoken_text}"
+    }
