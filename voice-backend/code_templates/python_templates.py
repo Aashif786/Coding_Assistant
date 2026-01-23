@@ -48,13 +48,13 @@ def try_except_template() -> str:
     return """try:
     pass
 except Exception as e:
-    print(e)
+    print(e)\n
 """
 
 
-def print_template() -> str:
-    return """print()"""
-
+def print_template(string: str | None = None) -> str:
+    content = string if string else ""
+    return f"""print("{content}")"""
 
 def return_template() -> str:
     return """return """

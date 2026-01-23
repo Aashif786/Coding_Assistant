@@ -1,4 +1,6 @@
+import re
 from intent_schema import IntentResult
+from text_normalizer import normalize_text
 
 def extract_name(text: str) -> str | None:
     words = text.split()
@@ -16,7 +18,15 @@ def extract_name(text: str) -> str | None:
 
 
 def classify_intent(text: str) -> IntentResult:
-    text = text.lower()
+    text = normalize_text(text)
+
+    if "line" in text:
+        match = re.search(r"line\s+(\d+)", text)
+        if match:
+            return IntentResult(
+                intent="GOTO_LINE",
+                name=match.group(1)
+            )
 
     if "function" in text:
         return IntentResult(
@@ -42,7 +52,8 @@ def classify_intent(text: str) -> IntentResult:
 
     if "print" in text:
         return IntentResult(
-            intent="PRINT"
+            intent="PRINT",
+            name= " ".join(text.split()[1:])
         )
 
     if "run" in text:

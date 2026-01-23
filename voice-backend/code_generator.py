@@ -10,52 +10,26 @@ LANGUAGE_TEMPLATES = {
 
 def generate_code(intent: IntentResult, language: str | None):
 
-    if intent.intent == "GENERATE_FUNCTION":
-        if not language :
-            return None
-        code = LANGUAGE_TEMPLATES.get(language.lower())
-        
-        if not code :
-            return None
-        return code.function_template(intent.name)
+    template = LANGUAGE_TEMPLATES.get(language.lower()) if language else None
 
-    if intent.intent == "PRINT":
-        if not language :
+    if not template:
+        return None
+
+    match intent.intent:
+        case "GENERATE_FUNCTION":
+            return template.function_template(intent.name)
+
+        case "GENERATE_CLASS":
+            return template.class_template(intent.name)
+
+        case "ADD_FOR_LOOP":
+            return template.for_loop_template()
+
+        case "ADD_WHILE_LOOP":
+            return template.while_loop_template()
+
+        case "PRINT":
+            return template.print_template(intent.name or "")
+
+        case _:
             return None
-        code = LANGUAGE_TEMPLATES.get(language.lower())
-
-        if not code :
-            return None
-        return code.print_template(intent.name)
-
-    if intent.intent == "GENERATE_CLASS":
-        if not language :
-            return None
-        code = LANGUAGE_TEMPLATES.get(language.lower())
-
-        if not code :
-            return None
-        return code.class_template(intent.name)
-
-    if intent.intent == "ADD_WHILE_LOOP":
-        if not language :
-            return None
-        code = LANGUAGE_TEMPLATES.get(language.lower())
-
-        if not code :
-            return None
-        return code.while_loop_template()(intent.name)
-
-    if intent.intent == "ADD_FOR_LOOP":
-        if not language :
-            return None
-        code = LANGUAGE_TEMPLATES.get(language.lower())
-
-        if not code :
-            return None
-        return code.for_loop_template()(intent.name)
-
-    if intent.intent == "RUN_CODE":
-        ...
-
-    return None

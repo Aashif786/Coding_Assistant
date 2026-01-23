@@ -71,6 +71,32 @@ export function activate(context: vscode.ExtensionContext) {
 					vscode.window.showInformationMessage(data.text);
 				}
 
+				if (data.action === 'move_cursor') {
+					const editor = vscode.window.activeTextEditor;
+					if (!editor) { return; }
+
+					const targetLine = data.line - 1; // VS Code is 0-based
+					const document = editor.document;
+					const totalLines = document.lineCount;
+
+					await editor.edit(editBuilder => {
+						if (targetLine >= totalLines) {
+							const linesToAdd = targetLine - totalLines + 1;
+							const newLines = '\n'.repeat(linesToAdd);
+							editBuilder.insert(
+								document.lineAt(totalLines - 1).range.end,
+								newLines
+							);
+						}
+					});
+
+					const position = new vscode.Position(targetLine, 0);
+					editor.selection = new vscode.Selection(position, position);
+					editor.revealRange(
+						new vscode.Range(position, position),
+						vscode.TextEditorRevealType.InCenter
+					);
+				}
 
 			} catch (error: any) {
 
