@@ -32,6 +32,18 @@ public void mean() {
 }
 
 
+public class app {
+
+
+    public app() {
+
+    }
+}
+
+
+
+System.out.println("hello");
+
 
 
 
