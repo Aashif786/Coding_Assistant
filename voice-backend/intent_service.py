@@ -1,44 +1,53 @@
 from intent_schema import IntentResult
 
+def extract_name(text: str) -> str | None:
+    words = text.split()
+
+    if "function" in words:
+        idx = words.index("function")
+        if idx + 1 < len(words):
+            return words[idx + 1]
+        
+    if "class" in words:
+        idx = words.index("class")
+        if idx + 1 < len(words):
+            return words[idx + 1]
+    return None
+
+
 def classify_intent(text: str) -> IntentResult:
     text = text.lower()
-    
+
     if "function" in text:
         return IntentResult(
             intent="GENERATE_FUNCTION",
-            language="python" if "python" in text else None,
-            name= text.split()[1 + text.split().index('function')]
+            name=extract_name(text)
         )
 
-    if "for"in text:
+    if "for" in text:
         return IntentResult(
-            intent="ADD_WHILE_LOOP",
-            language="python" if "python" in text else None
-        )
-    
-    if "while"in text:
-        return IntentResult(
-            intent="ADD_WHILE_LOOP",
-            language="python" if "python" in text else None
+            intent="ADD_FOR_LOOP"
         )
 
-    if "class"in text:
+    if "while" in text:
+        return IntentResult(
+            intent="ADD_WHILE_LOOP"
+        )
+
+    if "class" in text:
         return IntentResult(
             intent="GENERATE_CLASS",
-            language="python" if "python" in text else None
+            name=extract_name(text)
         )
-
 
     if "print" in text:
         return IntentResult(
-            intent="PRINT",
-            language="python" if "python" in text else None
+            intent="PRINT"
         )
-    
+
     if "run" in text:
         return IntentResult(
-            intent="RUN_CODE",
-            language= None
+            intent="RUN_CODE"
         )
 
     return IntentResult(intent="UNKNOWN")
