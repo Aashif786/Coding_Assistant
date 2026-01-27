@@ -13,27 +13,13 @@ public void good() {
 
 }
 
-
-Unsupported command: lane thirty
-
-Unsupported command: loop
-
-Unsupported command: far
-
-Unsupported command: far too
-
-Unsupported command: but in
-
 System.out.println("");
-
 
 public void mean() {
 
 }
 
-
 public class app {
-
 
     public app() {
 
@@ -42,8 +28,12 @@ public class app {
 
 
 
-System.out.println("hello");
+public void myMethod() {
 
+}
+
+
+System.out.println("hello");
 
 
 

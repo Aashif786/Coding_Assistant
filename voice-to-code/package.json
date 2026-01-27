@@ -16,6 +16,14 @@
       {
         "command": "voice-to-code.insertText",
         "title": "Voice To Code: Insert Test Text"
+      },
+      {
+        "command": "voice-to-code.testGoto",
+        "title": "Voice to Code: Test Goto"
+      },
+      {
+        "command": "voice-to-code.minimalTest",
+        "title": "Voice to Code: Simple Test"
       }
     ]
   },

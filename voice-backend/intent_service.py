@@ -18,14 +18,20 @@ def extract_name(text: str) -> str | None:
 
 
 def classify_intent(text: str) -> IntentResult:
-    text = normalize_text(text)
-
-    if "line" in text:
-        match = re.search(r"line\s+(\d+)", text)
+    
+    print(f"🔍 Original text: '{text}'")  # Debug
+    normalized_text = normalize_text(text)
+    print(f"🔍 Normalized text: '{normalized_text}'")  # Debug
+    
+    if "line" in normalized_text:
+        print(f"🔍 Found 'line' in text")  # Debug
+        match = re.search(r"line\s+(\d+)", normalized_text)
         if match:
+            line_num = match.group(1)
+            print(f"🔍 Extracted line number: {line_num}")  # Debug
             return IntentResult(
                 intent="GOTO_LINE",
-                name=match.group(1)
+                name=line_num
             )
 
     if "function" in text:
