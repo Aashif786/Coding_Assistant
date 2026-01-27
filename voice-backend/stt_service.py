@@ -1,53 +1,60 @@
 import sounddevice as sd
-import numpy as np
-import soundfile as sf
-import tempfile
-from faster_whisper import WhisperModel
+import queue
+import json
+from vosk import Model, KaldiRecognizer
 
+# Configuration constants
+MODEL_PATH = "models/vosk-model-small-en-in-0.4"
 SAMPLE_RATE = 16000
-RECORD_SECONDS = 4  # ideal for short commands
 
-# Load Whisper MEDIUM model ONCE
-model = WhisperModel(
-    "medium",
-    device="cpu",
-    compute_type="int8"   # faster, lower memory
-)
+# Global queue for audio data
+audio_queue = queue.Queue()
 
-def record_audio():
-    print("🎤 Listening for command...")
+def callback(indata, frames, time, status):
+    """
+    Callback function to put incoming audio data into the queue.
 
-    audio = sd.rec(
-        int(RECORD_SECONDS * SAMPLE_RATE),
-        samplerate=SAMPLE_RATE,
-        channels=1,
-        dtype="float32"
-    )
-    sd.wait()
-
-    return audio.squeeze()
+    Args:
+        indata: Numpy array containing the input data.
+        frames: Number of frames in indata.
+        time: Stream time.
+        status: PortAudio status flags.
+    """
+    if status:
+        print(status)
+    audio_queue.put(bytes(indata))
 
 def listen_once():
-    audio_data = record_audio()
+    """
+    Listens for a single voice command using VOSK and returns the recognized text.
+    """
+    try:
+        model = Model(MODEL_PATH)
+    except Exception as e:
+        print(f"Error loading VOSK model: {e}")
+        return None
 
-    # Save audio to a temporary WAV file
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
-        sf.write(tmp.name, audio_data, SAMPLE_RATE)
+    recognizer = KaldiRecognizer(model, SAMPLE_RATE)
+    print("🎤 Listening for command...")
 
-        segments, _ = model.transcribe(
-            tmp.name,
-            language="en",
-            beam_size=5
-        )
+    # Use a context manager for the audio stream
+    with sd.InputStream(
+        samplerate=SAMPLE_RATE,
+        channels=1,
+        dtype="int16",
+        callback=callback
+    ):
+        while True:
+            data = audio_queue.get()
+            if recognizer.AcceptWaveform(data):
+                result = json.loads(recognizer.Result())
+                text = result.get("text", "")
+                if text:
+                    print(f"📝 Recognized: {text}")
+                    return text
 
-        text = ""
-        for segment in segments:
-            text += segment.text
-
-        text = text.strip()
-
-        if text:
-            print("📝 Recognized:", text)
-            return text
-
-        return ""
+# Example usage (uncomment to test)
+# if __name__ == "__main__":
+#     recognized_text = listen_once()
+#     if recognized_text:
+#         print(f"Final Text: {recognized_text}")
