@@ -1,2 +1,4 @@
 /voice-to-code/node_modules
 /test
+/voice-backend/__pycache__
+/voice-backend/models/*
