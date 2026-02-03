@@ -1,3 +1,4 @@
+from typing import Optional
 import sounddevice as sd
 import queue
 import json
@@ -24,7 +25,7 @@ def callback(indata, frames, time, status):
         print(status)
     audio_queue.put(bytes(indata))
 
-def listen_once():
+def listen_once()-> Optional[str]:
     """
     Listens for a single voice command using VOSK and returns the recognized text.
     """
@@ -45,16 +46,23 @@ def listen_once():
         callback=callback
     ):
         while True:
-            data = audio_queue.get()
+            try:
+                data = audio_queue.get() 
+            except queue.Empty:
+                continue
+
             if recognizer.AcceptWaveform(data):
                 result = json.loads(recognizer.Result())
                 text = result.get("text", "")
                 if text:
                     print(f"📝 Recognized: {text}")
                     return text
+    return None
+    
 
 # Example usage (uncomment to test)
 # if __name__ == "__main__":
 #     recognized_text = listen_once()
 #     if recognized_text:
 #         print(f"Final Text: {recognized_text}")
+
