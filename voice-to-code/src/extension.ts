@@ -223,6 +223,13 @@ async function processVoiceCommand(mockText?: string) {
             return;
         }
 
+        if (data.action === 'stop_listening') {
+            isListening = false;
+            updateStatusBar(false);
+            vscode.window.showInformationMessage('Voice Loop Stopped');
+            return;
+        }
+
     } catch (error: any) {
         console.error('❌ Error:', error);
 

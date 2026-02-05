@@ -106,6 +106,20 @@ def command(context: dict):
             text="Redoing..."
         )
 
+    if intent.intent == "REDO":
+        return CommandAPIResponse(
+            status="ok",
+            action="redo",
+            text="Redoing..."
+        )
+
+    if intent.intent == "STOP_LISTENING":
+        return CommandAPIResponse(
+            status="ok",
+            action="stop_listening",
+            text="Deactivating voice mode..."
+        )
+
     code = generate_code(
         intent,
         context.get("language")
