@@ -206,6 +206,12 @@ async function processVoiceCommand(mockText) {
             await vscode.commands.executeCommand('editor.action.copyLinesDownAction');
             return;
         }
+        if (data.action === 'stop_listening') {
+            isListening = false;
+            updateStatusBar(false);
+            vscode.window.showInformationMessage('Voice Loop Stopped');
+            return;
+        }
     }
     catch (error) {
         console.error('❌ Error:', error);

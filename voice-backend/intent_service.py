@@ -9,7 +9,6 @@ def extract_name(text: str) -> str | None:
         idx = words.index("function")
         if idx + 1 < len(words):
             return words[idx + 1]
-        
     if "class" in words:
         idx = words.index("class")
         if idx + 1 < len(words):
@@ -101,9 +100,6 @@ def classify_intent(text: str) -> IntentResult:
 
     if "redo" in normalized_text:
         return IntentResult(intent="REDO")
-
-    if "stop" in normalized_text or "deactivate" in normalized_text or "exit" in normalized_text:
-        return IntentResult(intent="STOP_LISTENING")
     
 
     return IntentResult(intent="UNKNOWN")
