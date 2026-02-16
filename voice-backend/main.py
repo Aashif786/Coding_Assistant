@@ -120,6 +120,14 @@ def command(context: dict):
             text="Deactivating voice mode..."
         )
 
+    if intent.intent == "GOTO_DEFINITION":
+        return CommandAPIResponse(
+            status="ok",
+            action="goto_definition",
+            text=f"Going to {intent.name or 'definition'}",
+            name=intent.name
+        )
+
     code = generate_code(
         intent,
         context.get("language")

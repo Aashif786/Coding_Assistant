@@ -47,8 +47,21 @@ COMMON_FIXES = {
     "rain": "line",
     "late": "line",
     
-    # Removed "nine": "line" to allow number 9
-    # Removed specific "line X" mappings that were incorrect
+    "flash": "create",
+    "make": "create",
+    "made": "create",
+
+    "be active": "deactivate",
+    "be activity": "deactivate",
+    "david": "deactivate",
+    "the active": "deactivate",
+    "kill": "deactivate",
+    "be accurate": "deactivate",
+    "be active it": "deactivate",
+    "the activity": "deactivate",
+    "day active": "deactivate",
+    "the activate": "deactivate",
+
     "player": "delete line",
     "more lying": "delete line",
     "removal and": "delete line",
@@ -103,7 +116,14 @@ COMMON_FIXES = {
 }
 
 def normalize_text(text: str) -> str:
-    words = text.lower().split()
+    text = text.lower()
+    
+    # Prioritize multi-word replacements first
+    for key, value in COMMON_FIXES.items():
+        if " " in key and key in text:
+            text = text.replace(key, value)
+
+    words = text.split()
     normalized = []
 
     for word in words:

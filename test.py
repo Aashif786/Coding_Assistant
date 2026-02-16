@@ -6,18 +6,28 @@ class Computer:
    print('Selling Price: {}'.format(self.__maxprice))
 
  def setMaxPrice(self, price):
+
    self.__maxprice = price
 
 c = Computer()
-c.sell()
 
 # change the price
-c.__maxprice = 1000
+for i in range( : ):
+
+print("apple")
+
 c.sell()
 
 # using setter function
 c.setMaxPrice(1000)
-c.sell()
-for i in range( : ):
-    pass
+class al:
+    def __init__(self):
+        pass
 
+
+class MyClass:
+    def __init__(self):
+        pass
+
+
+c.sell()

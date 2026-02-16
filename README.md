@@ -73,37 +73,48 @@ The frontend integrates directly with the editor.
 
 ---
 
-## ✨ Key Features
+## 🎤 Command Reference
 
 ### 🧭 Navigation
 
-_Move through code without touching the keyboard or mouse._
-
-- “**Line 50**” → Jump to a specific line
-- “**Top**” / “**Bottom**” → Navigate file boundaries
-
----
+| Command             | Action                                                | Example                 |
+| :------------------ | :---------------------------------------------------- | :---------------------- |
+| **"Line [number]"** | Cursor jumps to the specified line number.            | "Line 25"               |
+| **"Top"**           | Moves cursor to the start of the file.                | "Top"                   |
+| **"Bottom"**        | Moves cursor to the end of the file.                  | "Bottom"                |
+| **"Go to [name]"**  | Searches for a function, class, or symbol definition. | "Go to calculate_total" |
+| **"Find [name]"**   | Same as "Go to".                                      | "Find user_model"       |
 
 ### ✍️ Editing & Manipulation
 
-_Perform common coding actions using natural speech._
+| Command                    | Action                                 | Example          |
+| :------------------------- | :------------------------------------- | :--------------- |
+| **"Remove line"**          | Deletes the current line.              | "Remove line"    |
+| **"Remove line [number]"** | Deletes a specific line number.        | "Remove line 15" |
+| **"Duplicate"**            | Duplicates the current line downwards. | "Duplicate"      |
+| **"Comment"**              | Comments out the current line.         | "Comment"        |
+| **"Uncomment"**            | Uncomments the current line.           | "Uncomment"      |
+| **"Undo"**                 | Reverses the last action.              | "Undo"           |
+| **"Redo"**                 | Re-applies the last undone action.     | "Redo"           |
 
-- “**Remove line**” → Delete current line
-- “**Duplicate**” → Copy line downward
-- “**Comment**” / “**Uncomment**”
-- “**Undo**” / “**Redo**”
+### ⚡ Code Generation
 
----
+| Command                      | Action                                              | Example                           |
+| :--------------------------- | :-------------------------------------------------- | :-------------------------------- |
+| **"Create function [name]"** | Generates a function template with the given name.  | "Create function login_user"      |
+| **"Create class [name]"**    | Generates a class template.                         | "Create class PaymentProcessor"   |
+| **"For"**                    | Inserts a for-loop template.                        | "For"                             |
+| **"While"**                  | Inserts a while-loop template.                      | "While"                           |
+| **"Print [text]"**           | Inserts a print statement with the text.            | "Print hello world"               |
+| **"[Any other prompt]"**     | Uses AI to generate code based on your description. | "Create a binary search function" |
 
-### ⚙️ Workflow Control
+### ⚙️ System & Workflow
 
-_Manage the IDE environment itself._
-
-- “**Run code**” → Execute the current file
-- “**Stop listening**” → Temporarily disable voice input
-- “**Deactivate**” → Pause the assistant safely
-
----
+| Command              | Action                             | Example          |
+| :------------------- | :--------------------------------- | :--------------- |
+| **"Run code"**       | Runs the current file (or debugs). | "Run code"       |
+| **"Stop listening"** | Deactivates voice mode loop.       | "Stop listening" |
+| **"Exit / Kill"**    | Same as stopping listening.        | "Exit voice"     |
 
 ## 🛠️ Installation & Setup
 
