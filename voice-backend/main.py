@@ -7,6 +7,7 @@ from response_schema import CommandAPIResponse
 from stt_service import listen_once # LINE 29
 from intent_service import classify_intent 
 from code_generator import generate_code
+from llm_service import generate_code_snippet
 
 class DebugRequest(BaseModel):
     line: int = 20
@@ -127,6 +128,23 @@ def command(context: dict):
             text=f"Going to {intent.name or 'definition'}",
             name=intent.name
         )
+
+    if intent.intent == "GENERATE_CODE_SNIPPET":
+        print(f"🧠 Generating code with LLM: {intent.name}")
+        code = generate_code_snippet(intent.name, context.get("language"))
+        if code:
+            return CommandAPIResponse(
+                status="ok",
+                action="insert",
+                text=code,
+                line=None
+            )
+        else:
+            return CommandAPIResponse(
+                status="error",
+                action="message",
+                text="Failed to generate code from LLM."
+            )
 
     code = generate_code(
         intent,

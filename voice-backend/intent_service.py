@@ -42,12 +42,20 @@ def classify_intent(text: str) -> IntentResult:
     if normalized_text.startswith("9 "):
         normalized_text = normalized_text.replace("9 ", "line ", 1)
         print(f"🔄 Adjusted '9' -> 'line': '{normalized_text}'")
-
     
     # 1. STOP COMMANDS (High Priority)
     stop_keywords = ["stop listening", "deactivate", "exit voice", "kill", "exit", "shut down", "stop"]
     if any(kw in normalized_text for kw in stop_keywords):
         return IntentResult(intent="STOP_LISTENING")
+
+    # 2. GENERATE CODE (High Priority - intercepts commands that mention other keywords)
+    if normalized_text.startswith("code"):
+        instruction = normalized_text.replace("code", "", 1).strip()
+        if instruction:
+             return IntentResult(
+                intent="GENERATE_CODE_SNIPPET",
+                name=instruction
+            )
 
     if "remove line" in normalized_text or "delete line" in normalized_text:
         match = re.search(r"line\s+(\d+)", normalized_text)

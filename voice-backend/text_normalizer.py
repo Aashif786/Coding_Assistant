@@ -87,6 +87,9 @@ COMMON_FIXES = {
     "shun": "function",
 
     "plus": "print",
+    "drink": "print",
+    "think": "print",
+    "prima": "print",
     "prince": "print",
 
     "clasp": "class",
