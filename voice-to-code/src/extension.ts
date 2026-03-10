@@ -105,12 +105,11 @@ function updateStatusBar(active: boolean) {
     statusBarItem.backgroundColor = new vscode.ThemeColor(
       "statusBarItem.warningBackground",
     );
-    statusBarItem.show();
   } else {
     statusBarItem.text = "$(mic) Voice Mode";
     statusBarItem.backgroundColor = undefined;
-    statusBarItem.hide(); // Or show as idle
   }
+  statusBarItem.show(); // always visible
 }
 
 async function processVoiceCommand(mockText?: string) {

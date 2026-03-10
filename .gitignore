@@ -1,4 +1,12 @@
 /voice-to-code/node_modules
-/test
+/voice-backend/code_templates/__pycache__
 /voice-backend/__pycache__
 /voice-backend/models/*
+/voice-backend/.env
+/voice-backend/env
+/docs/reference
+/docs/patent
+/docs/dump
+**/.env
+/test
+.env

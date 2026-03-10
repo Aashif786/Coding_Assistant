@@ -90,13 +90,21 @@ COMMON_FIXES = {
     "drink": "print",
     "think": "print",
     "prima": "print",
+    "printer": "print",
+    "erin": "print",
     "prince": "print",
 
     "clasp": "class",
     "glass": "class",
+    "glass": "class",
+    "clash": "class",
+    "crash": "class",
 
     "wile": "while",
     "vile": "while",
+    "ford": "code",
+    "and": "run",
+    "why": "while",
 
     "poor": "for",
     "far": "for",
