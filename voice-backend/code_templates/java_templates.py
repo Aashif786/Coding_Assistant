@@ -14,7 +14,7 @@ def class_template(name: str | None = None) -> str:
     class_name = name if name else "MyClass"
     return f"""public class {class_name} {{\n
 
-    public {class_name}() {{\n
+    public {class_name}() {{\n \n
     }}
 }}
 """
