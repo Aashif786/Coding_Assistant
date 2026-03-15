@@ -1,2 +1,10 @@
 fastapi
 uvicorn
+sounddevice
+numpy
+openai-whisper
+setuptools-rust
+python-dotenv
+requests
+vosk
+deepgram-sdk

@@ -83,3 +83,40 @@ def generate_code_snippet(prompt: str, language: str) -> str | None:
 
     print("❌ All models failed.")
     return None
+
+def query_llm(system_prompt: str, user_prompt: str) -> str | None:
+    if not GROQ_API_KEY:
+        print("❌ Error: GROQ_API_KEY not found in .env")
+        return None
+
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    for model in MODELS:
+        data = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+        }
+        try:
+            print(f"🤖 Querying {model}...")
+            response = requests.post(GROQ_URL, headers=headers, json=data, timeout=20)
+            
+            if response.status_code == 429:
+                wait = int(response.headers.get("Retry-After", 5))
+                time.sleep(wait)
+                continue
+
+            response.raise_for_status()
+            result = response.json()
+            return result['choices'][0]['message']['content'].strip()
+
+        except Exception as e:
+            print(f"❌ Error with model {model}: {e}")
+            continue
+
+    return None

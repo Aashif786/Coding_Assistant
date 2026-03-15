@@ -28,14 +28,18 @@ class EditorContext(BaseModel):
     totalLines: Optional[int]
     mock_text: Optional[str] = None
 
+from fastapi.concurrency import run_in_threadpool
+
 @app.post("/command", response_model=CommandAPIResponse)
-def command(context: dict):
+async def command(context: dict):
     # Check for mock text from simulation command
     if context.get("mock_text"):
         spoken_text = context["mock_text"]
         print(f"🧪 Using mock text: {spoken_text}")
     else:
-        spoken_text = listen_once()
+        # listen_once() is blocking (records for 5s), so run it in a threadpool
+        # to keep the async loop responsive.
+        spoken_text = await run_in_threadpool(listen_once)
 
     if not spoken_text:
         return {
@@ -128,6 +132,37 @@ def command(context: dict):
             text=f"Going to {intent.name or 'definition'}",
             name=intent.name
         )
+
+    if intent.intent == "CREATE_FILE":
+        return CommandAPIResponse(status="ok", action="create_file", name=intent.name, text=f"Creating file {intent.name}")
+
+    if intent.intent == "OPEN_FILE":
+        return CommandAPIResponse(status="ok", action="open_file", name=intent.name, text=f"Opening file {intent.name}")
+
+    if intent.intent == "SAVE_FILE":
+        return CommandAPIResponse(status="ok", action="save_file", text="Saving file")
+
+    if intent.intent == "CLOSE_FILE":
+        return CommandAPIResponse(status="ok", action="close_file", text="Closing file")
+
+    if intent.intent == "SELECT_ALL":
+        return CommandAPIResponse(status="ok", action="select_all", text="Selecting all")
+
+    if intent.intent == "COPY":
+        return CommandAPIResponse(status="ok", action="copy", text="Copied")
+
+    if intent.intent == "PASTE":
+        return CommandAPIResponse(status="ok", action="paste", text="Pasted")
+
+    if intent.intent == "DEBUG_ERROR":
+        # In a real implementation, we'd gather diagnostics from the editor context
+        return CommandAPIResponse(status="ok", action="message", text=f"Analyzing errors on line {intent.line or 'current'}...")
+
+    if intent.intent == "EXPLAIN_ERROR":
+        return CommandAPIResponse(status="ok", action="message", text="Explaining current error...")
+
+    if intent.intent == "FIX_ERROR":
+        return CommandAPIResponse(status="ok", action="message", text="Attempting to fix error...")
 
     if intent.intent == "GENERATE_CODE_SNIPPET":
         print(f"🧠 Generating code with LLM: {intent.name}")

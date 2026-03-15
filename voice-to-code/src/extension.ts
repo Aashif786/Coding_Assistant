@@ -179,75 +179,77 @@ async function processVoiceCommand(mockText?: string) {
         // Only show interesting messages, skip "silence" messages in loop
         vscode.window.showInformationMessage(data.text);
       }
-      return;
-    }
-
-    // remove line
-    if (data.action === "remove_line") {
+    } else if (data.action === "remove_line") {
       await handleRemoveLine(editor, data.line);
-      return;
-    }
-
-    if (data.action === "run_code") {
+    } else if (data.action === "run_code") {
       await vscode.commands.executeCommand("workbench.action.debug.run");
-      // Or 'workbench.action.terminal.runActiveFile' or 'python.execInTerminal'
       vscode.window.setStatusBarMessage("Running code...", 3000);
-      return;
-    }
-
-    if (data.action === "undo") {
+    } else if (data.action === "undo") {
       await vscode.commands.executeCommand("undo");
       vscode.window.setStatusBarMessage("Undid last action", 2000);
-      return;
-    }
-
-    if (data.action === "redo") {
+    } else if (data.action === "redo") {
       await vscode.commands.executeCommand("redo");
       vscode.window.setStatusBarMessage("Redid last action", 2000);
-      return;
-    }
-
-    if (data.action === "comment_line") {
+    } else if (data.action === "comment_line") {
       await vscode.commands.executeCommand("editor.action.addCommentLine");
-      return;
-    }
-
-    if (data.action === "uncomment_line") {
+    } else if (data.action === "uncomment_line") {
       await vscode.commands.executeCommand("editor.action.removeCommentLine");
-      return;
-    }
-
-    if (data.action === "goto_top") {
+    } else if (data.action === "toggle_comment") {
+      await vscode.commands.executeCommand("editor.action.commentLine");
+    } else if (data.action === "goto_top") {
       await vscode.commands.executeCommand("cursorTop");
-      await vscode.commands.executeCommand("cursorTop"); // Ensure scroll to top
-      return;
-    }
-
-    if (data.action === "goto_bottom") {
+    } else if (data.action === "goto_bottom") {
       await vscode.commands.executeCommand("cursorBottom");
-      await vscode.commands.executeCommand("cursorBottom"); // Ensure scroll to bottom
-      return;
-    }
-
-    if (data.action === "duplicate_line") {
+    } else if (data.action === "duplicate_line") {
       await vscode.commands.executeCommand("editor.action.copyLinesDownAction");
-      return;
-    }
-
-    if (data.action === "stop_listening") {
+    } else if (data.action === "stop_listening") {
       isListening = false;
       updateStatusBar(false);
       vscode.window.showInformationMessage("Voice Loop Stopped");
-      return;
-    }
-
-    if (data.action === "goto_definition" && data.name) {
-      // Use Quick Open to search for the symbol in the current file
-      await vscode.commands.executeCommand(
-        "workbench.action.quickOpen",
-        "@" + data.name,
-      );
-      return;
+    } else if (data.action === "goto_definition" && data.name) {
+      await vscode.commands.executeCommand("workbench.action.quickOpen", "@" + data.name);
+    } else if (data.action === "create_file" && data.name) {
+      await handleCreateFile(data.name);
+    } else if (data.action === "open_file" && data.name) {
+      await handleOpenFile(data.name);
+    } else if (data.action === "save_file") {
+      await editor.document.save();
+      vscode.window.setStatusBarMessage("File saved", 2000);
+    } else if (data.action === "close_file") {
+      await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+    } else if (data.action === "select_all") {
+      await vscode.commands.executeCommand("editor.action.selectAll");
+    } else if (data.action === "copy") {
+      await vscode.commands.executeCommand("editor.action.clipboardCopyAction");
+      vscode.window.setStatusBarMessage("Copied to clipboard", 2000);
+    } else if (data.action === "cut") {
+      await vscode.commands.executeCommand("editor.action.clipboardCutAction");
+      vscode.window.setStatusBarMessage("Cut to clipboard", 2000);
+    } else if (data.action === "paste") {
+      await vscode.commands.executeCommand("editor.action.clipboardPasteAction");
+    } else if (data.action === "find") {
+      await vscode.commands.executeCommand("actions.find");
+    } else if (data.action === "replace") {
+      await vscode.commands.executeCommand("editor.action.startFindReplaceAction");
+    } else if (data.action === "new_line_above") {
+      await vscode.commands.executeCommand("editor.action.insertLineAbove");
+    } else if (data.action === "new_line_below") {
+      await vscode.commands.executeCommand("editor.action.insertLineAfter");
+    } else if (data.action === "delete_word") {
+      await vscode.commands.executeCommand("deleteWordRight"); // Or deleteWordLeft
+    } else if (data.action === "select_word") {
+      await vscode.commands.executeCommand("editor.action.selectWord");
+    } else if (data.action === "select_line") {
+      await vscode.commands.executeCommand("editor.action.selectLine");
+    } else if (data.action === "go_to_start_of_line") {
+      await vscode.commands.executeCommand("cursorHome");
+    } else if (data.action === "go_to_end_of_line") {
+      await vscode.commands.executeCommand("cursorEnd");
+    } else {
+      console.warn("Unhandled action:", data.action);
+      if (!isListening) {
+        vscode.window.showWarningMessage(`Unhandled voice command action: ${data.action}`);
+      }
     }
   } catch (error: any) {
     console.error("❌ Error:", error);
@@ -347,6 +349,37 @@ async function handleRemoveLine(
       editBuilder.delete(range);
     });
     vscode.window.setStatusBarMessage(`Removed line ${currentLine + 1}`, 3000);
+  }
+}
+
+async function handleCreateFile(name: string) {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders) {
+    vscode.window.showErrorMessage("No workspace folder open");
+    return;
+  }
+
+  const newFileUri = vscode.Uri.joinPath(workspaceFolders[0].uri, name);
+  try {
+    // Create an empty file
+    await vscode.workspace.fs.writeFile(newFileUri, new Uint8Array());
+    // Open it
+    const document = await vscode.workspace.openTextDocument(newFileUri);
+    await vscode.window.showTextDocument(document);
+    vscode.window.showInformationMessage(`Created and opened ${name}`);
+  } catch (err: any) {
+    vscode.window.showErrorMessage(`Failed to create file: ${err.message}`);
+  }
+}
+
+async function handleOpenFile(name: string) {
+  const files = await vscode.workspace.findFiles(`**/${name}`, null, 1);
+  if (files.length > 0) {
+    const document = await vscode.workspace.openTextDocument(files[0]);
+    await vscode.window.showTextDocument(document);
+  } else {
+    // Try quick open if not found directly
+    await vscode.commands.executeCommand("workbench.action.quickOpen", name);
   }
 }
 
