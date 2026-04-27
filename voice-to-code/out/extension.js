@@ -165,6 +165,12 @@ async function processVoiceCommand(mockText) {
         else if (data.action === "remove_line") {
             await handleRemoveLine(editor, data.line);
         }
+        else if (data.action === "select_lines") {
+            await handleSelectLines(editor, data.line, data.line_end);
+        }
+        else if (data.action === "remove_lines") {
+            await handleRemoveLines(editor, data.line, data.line_end);
+        }
         else if (data.action === "run_code") {
             await vscode.commands.executeCommand("workbench.action.debug.run");
             vscode.window.setStatusBarMessage("Running code...", 3000);
@@ -334,6 +340,41 @@ async function handleRemoveLine(editor, line) {
             editBuilder.delete(range);
         });
         vscode.window.setStatusBarMessage(`Removed line ${currentLine + 1}`, 3000);
+    }
+}
+async function handleSelectLines(editor, startLine, endLine) {
+    if (startLine === undefined || endLine === undefined)
+        return;
+    const document = editor.document;
+    const startIdx = Math.max(0, startLine - 1);
+    const endIdx = Math.min(document.lineCount - 1, Math.max(0, endLine - 1));
+    if (startIdx < document.lineCount) {
+        const startPos = new vscode.Position(startIdx, 0);
+        const endPos = new vscode.Position(endIdx, document.lineAt(endIdx).text.length);
+        editor.selection = new vscode.Selection(startPos, endPos);
+        editor.revealRange(new vscode.Range(startPos, endPos));
+    }
+}
+async function handleRemoveLines(editor, startLine, endLine) {
+    if (startLine === undefined || endLine === undefined)
+        return;
+    const document = editor.document;
+    const startIdx = Math.max(0, startLine - 1);
+    const endIdx = Math.max(0, endLine - 1);
+    if (startIdx < document.lineCount) {
+        const startPos = new vscode.Position(startIdx, 0);
+        let endPos;
+        if (endIdx + 1 < document.lineCount) {
+            endPos = new vscode.Position(endIdx + 1, 0);
+        }
+        else {
+            endPos = new vscode.Position(Math.min(endIdx, document.lineCount - 1), document.lineAt(Math.min(endIdx, document.lineCount - 1)).text.length);
+        }
+        const range = new vscode.Range(startPos, endPos);
+        await editor.edit((editBuilder) => {
+            editBuilder.delete(range);
+        });
+        vscode.window.setStatusBarMessage(`Removed lines ${startLine} to ${endLine}`, 3000);
     }
 }
 async function handleCreateFile(name) {

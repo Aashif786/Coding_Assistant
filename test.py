@@ -1,28 +1,13 @@
 
-for i in range(11): 
-    print(i)
-
-class Vehicle:
-    def __init__(self, make, model, year):
-        self.make = make
-        self.model = model
-        self.year = year
+import math
 
 
-    def __str__(self):
-        return f"{self.year} {self.make} {self.model}"
+radius = 5
 
-def fuel_two(tank_capacity, current_fuel):
+area = 3.14 * radius ** 2
 
-correct = True
+print(area)
 
-None
-def fuel_two(tank_capacity, current_fuel):
-    return tank_capacity - current_fuel
+circumference = 2 * 3.14 * radius
 
-
-
-
-
-
-
+print(circumference)

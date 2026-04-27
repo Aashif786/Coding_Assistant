@@ -6,3 +6,4 @@ class IntentResult(BaseModel):
     language: Optional[str] = None
     name: Optional[str] = None
     line: Optional[int] = None
+    line_end: Optional[int] = None

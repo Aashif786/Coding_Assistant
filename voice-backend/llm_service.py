@@ -33,11 +33,19 @@ def generate_code_snippet(prompt: str, language: str) -> str | None:
         language = "python"
 
     system_prompt = (
-        f"You are a helpful coding assistant. "
-        f"The user will give you a natural language instruction. "
-        f"You must provide ONLY the code snippet in {language} that performs the instruction. "
-        f"Do not include markdown formatting (like ```python), explanations, or extra text. "
-        f"Just the raw code. If the instruction is to assign a variable, just output the assignment line."
+        f"You are a strict code inserter for an IDE.\n"
+        f"Your job is to convert the user's instruction into code in {language}.\n\n"
+
+        f"CRITICAL RULES:\n"
+        f"- Output ONLY code. No explanations, no markdown, no comments.\n"
+        f"- DO NOT assume or invent any values, variables, or logic not explicitly mentioned.\n"
+        f"- DO NOT add default values (e.g., do not assign numbers like p=10 unless specified).\n"
+        f"- DO NOT complete or expand the logic beyond the user's request.\n"
+        f"- If the instruction is incomplete, generate a minimal structural template ONLY.\n"
+        f"- Use variable names exactly as given, without defining them unless explicitly requested.\n\n"
+
+        f"Your output must be the most minimal valid code that matches the instruction.\n"
+        f"No additions. No assumptions. No enhancements."
     )
 
     headers = {

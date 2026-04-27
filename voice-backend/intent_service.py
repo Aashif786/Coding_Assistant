@@ -38,12 +38,20 @@ def classify_intent(text: str) -> IntentResult:
         return IntentResult(intent="STOP_LISTENING")
 
     # 2. FILE OPERATIONS
-    if "create" in normalized_text and "file" in normalized_text:
-        instruction = normalized_text.replace("create", "", 1).replace("file", "", 1).strip()
+    if ("create" in normalized_text or "make" in normalized_text) and "file" in normalized_text:
+        instruction = normalized_text.replace("create", "", 1).replace("make", "", 1).replace("file", "", 1).strip()
+        # Make extraction resilient to filler words and 'dot'
+        instruction = instruction.replace(" with name ", " ").replace(" named ", " ").replace(" a ", " ").replace(" an ", " ")
+        instruction = instruction.replace(" new ", " ").replace(" called ", " ")
+        instruction = instruction.replace(" dot ", ".").replace(" dot", ".")
+        instruction = instruction.strip()
         return IntentResult(intent="CREATE_FILE", name=instruction)
+        
     if "open" in normalized_text and "file" in normalized_text:
         name = normalized_text.replace("open", "", 1).replace("file", "", 1).strip()
+        name = name.replace(" a ", " ").replace(" an ", " ").replace(" dot ", ".").replace(" dot", ".").strip()
         return IntentResult(intent="OPEN_FILE", name=name)
+        
     if "save" in normalized_text:
         return IntentResult(intent="SAVE_FILE")
     if "close" in normalized_text and ("file" in normalized_text or "this" in normalized_text or "tab" in normalized_text):
@@ -68,7 +76,21 @@ def classify_intent(text: str) -> IntentResult:
         return IntentResult(intent="DEBUG_ERROR", line=line_num)
 
     # 5. LINE & NAVIGATION OPERATIONS
-    if "remove line" in normalized_text or "delete line" in normalized_text:
+    # Match "select lines 1 to 10" 
+    select_match = re.search(r"select (?:\w+\s+)?lines?\s+(?:from\s+)?(\d+)\s+to\s+(\d+)", normalized_text)
+    if select_match:
+        start = int(select_match.group(1))
+        end = int(select_match.group(2))
+        return IntentResult(intent="SELECT_LINES", line=start, line_end=end)
+
+    # Match "remove lines 1 to 10"
+    remove_range_match = re.search(r"(?:remove|delete) (?:\w+\s+)?lines?\s+(?:from\s+)?(\d+)\s+to\s+(\d+)", normalized_text)
+    if remove_range_match:
+        start = int(remove_range_match.group(1))
+        end = int(remove_range_match.group(2))
+        return IntentResult(intent="REMOVE_LINES", line=start, line_end=end)
+
+    if "remove line" in normalized_text or "delete line" in normalized_text or normalized_text == "delete" or normalized_text == "remove":
         match = re.search(r"line\s+(\d+)", normalized_text)
         if match:
              return IntentResult(intent="REMOVE_LINE", line=int(match.group(1)))

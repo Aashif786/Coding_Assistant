@@ -16,49 +16,24 @@ NUMBER_WORDS = {
 
 COMMON_FIXES = {
     "lane": "line",
-    "lame": "line",
-    "right": "line",
-    "name": "line",
-    "main": "line",
-    "i'm": "line",
-    "life": "line",
-    "mine": "line",
-    "lie": "line",
-    "rain": "line",
-    "late": "line",
-    "by done": "python",
+    "Select on": "Select all",
+    "on": "all",
     "pissed": "paste",
     "based": "paste",
     "best": "paste",
+    "and do": "undo",
     
-    "flash": "create",
     "make": "create",
     "made": "create",
-    
-    "wile": "while",
-    "vile": "while",
-    "ford": "code",
-    "and": "run",
-    "why": "while",
-
-    "poor": "for",
+    "rate": "create",
+    "great": "create",
+    "crate": "create",
+    "greet": "create",
     "far": "for",
     "four": "for",
     "luke": "loop",
 
-    # delete / remove normalization
-    "remove": "delete line",
-    "they names": "delete line",
-    "removed": "delete line",
-    "removing": "delete line",
-    "delete": "delete line",
-    "deleted": "delete line",
-    "clear": "delete line",
-    "clears": "delete line",
-    "delet": "delete line",
-    "del": "delete line",
-    "thelate": "delete line",
-    "delate": "delete line"
+    # delete / remove normalization will be handled directly in the intent classifier
 }
 
 def normalize_text(text: str) -> str:

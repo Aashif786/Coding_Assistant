@@ -74,6 +74,15 @@ async def command(context: dict):
             line=line_number,
             text=f"Removed line {line_number if line_number else ''}"
         )
+      
+    if intent.intent == "REMOVE_LINES":
+        return CommandAPIResponse(
+            status="ok",
+            action="remove_lines",
+            line=intent.line,
+            line_end=intent.line_end,
+            text=f"Removed lines {intent.line} to {intent.line_end}"
+        )
 
     if intent.intent == "COMMENT_LINE":
         return CommandAPIResponse(status="ok", action="comment_line", text="Commenting line")
@@ -153,6 +162,15 @@ async def command(context: dict):
 
     if intent.intent == "PASTE":
         return CommandAPIResponse(status="ok", action="paste", text="Pasted")
+
+    if intent.intent == "SELECT_LINES":
+        return CommandAPIResponse(
+            status="ok",
+            action="select_lines",
+            line=intent.line,
+            line_end=intent.line_end,
+            text=f"Selected lines {intent.line} to {intent.line_end}"
+        )
 
     if intent.intent == "DEBUG_ERROR":
         # In a real implementation, we'd gather diagnostics from the editor context
